@@ -23,20 +23,12 @@ doRotation lock n =
 doRotationCountAllZero :: Lock -> Int -> Lock
 doRotationCountAllZero lock n =
 	let
-		direction = if n < 0 then -1 else 1
-		steps = replicate (abs n) direction
+		start = currentDial lock
+		end = start + n
+		zeroCrossings = abs (end `div` 100 - start `div` 100)
+		newDial = end `mod` 100
 	in
-		foldl clickOnce lock steps
-
-clickOnce :: Lock -> Int -> Lock
-clickOnce lock d =
-	let 
-		nextDial = (currentDial lock + d + 100) `mod` 100
-		nextLock = lock { currentDial = nextDial }
-	in
-		if nextDial == 0
-		then nextLock { zeroCount = zeroCount nextLock + 1 }
-		else nextLock
+		lock { currentDial = newDial, zeroCount = zeroCount lock + zeroCrossings }
 
 parseRotation :: String -> Int
 parseRotation rotationString = read $ if head rotationString == 'L' then '-':tail rotationString else tail rotationString
